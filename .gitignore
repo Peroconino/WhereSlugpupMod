@@ -5,6 +5,7 @@
 
 #remove the lib folder (contains the .dll files)
 /lib
+.vscode
 
 # User-specific files
 *.rsuser
