@@ -17,11 +17,12 @@ public class WhereSlugpupMain : BaseUnityPlugin
     public const string GUID = "prismsoup.whereslugpupmod";
     public const string Name = "Where Slugpup ?";
     public const string Version = "1.0.2";
-    bool isInit = false, isNewPupFound = false, isCycleStarted = false;
+    bool isInit = false, isCycleStarted = false;
     private readonly WhereSlugpupOptions whereSlugpupOptions;
     private readonly CustomLogger CustomLogger;
     private readonly Dictionary<AbstractCreature, SlugpupData> unTammedPups = [];
     private readonly List<int> uniqueMarkers = [];
+    private float StartTime;
     public WhereSlugpupMain()
     {
         CustomLogger = new CustomLogger();
@@ -76,10 +77,10 @@ public class WhereSlugpupMain : BaseUnityPlugin
             {//if they are not in the same shelter we assume they are new pups
                 var marker = new SlugpupMarker(pup.world.game.cameras[0].hud.map, self.index, markerPosition, SlugpupColor(pup));
                 unTammedPups.Add(pup, new SlugpupData(marker)); // for now all pups here, must be filtered
-
+                CustomLogger.LogInfo($"pup {pup.ID} added!");
                 if (!uniqueMarkers.Any(roomIndex => roomIndex == marker.room))
                 {
-                    CustomLogger.LogInfo($"marker {marker.room} adicionado!");
+                    CustomLogger.LogInfo($"marker {marker.room} added!");
                     uniqueMarkers.Add(marker.room);
                 }
             }
@@ -89,16 +90,18 @@ public class WhereSlugpupMain : BaseUnityPlugin
     {
         orig(self, processManager);
         isCycleStarted = false;
+        StartTime = Time.time; // reset timer every respawn
+        unTammedPups.Clear();// reset dictonary every respawn
+
     }
     private void Hook_RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
     {
         orig(self);
 
         var newPupsCount = unTammedPups.Count;
-        var pups = unTammedPups.ToList();
-        var game = self;
-        if (newPupsCount > 0 && newPupsCount <= 2 && game.cameras[0].hud != null && !isCycleStarted)
+        if (!isCycleStarted && newPupsCount > 0 && newPupsCount <= 2)
         {
+            List<KeyValuePair<AbstractCreature, SlugpupData>> pups = [.. unTammedPups];
             foreach (KeyValuePair<AbstractCreature, SlugpupData> pairPupData in pups)
             {
                 var pupData = pairPupData.Value;
@@ -112,19 +115,23 @@ public class WhereSlugpupMain : BaseUnityPlugin
                 if (whereSlugpupOptions.wantsPupRoom.Value)
                     text += " in " + pupAbstract.Room.name;
 
-                game.cameras[0].hud.textPrompt.AddMessage(text, 10, 450, false, true);
-                game.cameras[0].room.AddObject(new PupPing(game.cameras[0].room));
+                self.cameras[0].hud.textPrompt.AddMessage(text, 10, 450, false, true);
+                self.cameras[0].room.AddObject(new PupPing(self.cameras[0].room));
+                isCycleStarted = true;
             }
-            isCycleStarted = true;
         }
         else if (!isCycleStarted && newPupsCount > 0)
         {
             string text = "Many slugpups has spawned!";
-            game.cameras[0].hud.textPrompt.AddMessage(text, 10, 450, false, true);
-            game.cameras[0].room.AddObject(new PupPing(game.cameras[0].room));
+            self.cameras[0].hud.textPrompt.AddMessage(text, 10, 450, false, true);
+            self.cameras[0].room.AddObject(new PupPing(self.cameras[0].room));
             isCycleStarted = true;
         }
 
+        if ((Time.time - StartTime) >= 1.0f) //Enters here if world reset and you have all pups with you already
+        {
+            isCycleStarted = true;
+        }
     }
     // private void DidMySlugpupJustMove(On.AbstractCreatureAI.orig_Moved orig, AbstractCreatureAI self)
     // {
@@ -138,36 +145,24 @@ public class WhereSlugpupMain : BaseUnityPlugin
     private void Hook_HUD_Map_Update(On.HUD.Map.orig_Update orig, Map self)
     {
         orig(self);
-        if (whereSlugpupOptions.wantsPupMap.Value)
+        if (whereSlugpupOptions.wantsPupMap.Value && unTammedPups.Count > 0 && uniqueMarkers.Count > 0)
         {
-            var list = uniqueMarkers;
-            for (int i = 0; i < list.Count; i++)
+            for (int i = 0; i < uniqueMarkers.Count; i++)
             {
-                var pup = unTammedPups.First(pup => pup.Value.FoundPupMarker.room == list[i]);
-                var game = pup.Key.world.game;
+                var pup = unTammedPups.First(pup => pup.Value.FoundPupMarker.room == uniqueMarkers[i]);
                 if (!pup.Value.IsMarkedOnTheMap)
                 {
-                    game.cameras[0].hud.map.mapObjects.Add(unTammedPups[pup.Key].FoundPupMarker);
+                    pup.Key.world.game.cameras[0].hud.map.mapObjects.Add(unTammedPups[pup.Key].FoundPupMarker);
                     pup.Value.IsMarkedOnTheMap = true;
                 }
             }
         }
     }
-
-    //Is called whenever the player crosses to a new region via a gate
-    //Resets isNewPupFound, isCycleStart and isPupDead to their default values
-    // private void RegionGate_NewWorldLoaded(On.RegionGate.orig_NewWorldLoaded orig, RegionGate self)
-    // {
-    //     orig(self);
-    //     isNewPupFound = false;
-    //     isCycleStarted = true;
-    // }
-    //Checks if the spawned slugpup has died
     private void Hook_On_AbstractCreature_Die(On.AbstractCreature.orig_Die orig, AbstractCreature self)
     {
         try
         {
-            if (self.world.game.IsStorySession && isNewPupFound && unTammedPups.ContainsKey(self))
+            if (self.world.game.IsStorySession && unTammedPups.ContainsKey(self))
             {
                 var pupData = unTammedPups[self];
                 pupData.FoundPupMarker.PupDied();
