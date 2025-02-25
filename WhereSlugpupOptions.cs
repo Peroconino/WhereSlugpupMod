@@ -8,13 +8,15 @@ class WhereSlugpupOptions : OptionInterface
     public Configurable<bool> wantsPupID;
     public Configurable<bool> wantsPupRoom;
     public Configurable<bool> wantsPupMap;
-    private readonly CustomLogger Logger;
+    public Configurable<bool> wantsEnhancedSlugpupAwareness;
+    private readonly CustomLogger CustomLogger;
     public WhereSlugpupOptions(CustomLogger logger)
     {
-        Logger = logger;
-        wantsPupID = config.Bind("WhereSlugpup_wantsPupID", true);
-        wantsPupRoom = config.Bind("WhereSlugpup_wantsPupRoom", true);
-        wantsPupMap = config.Bind("WhereSlugpup_wantsPupMap", true);
+        CustomLogger = logger;
+        wantsPupID = config.Bind("wantsPupID", true);
+        wantsPupRoom = config.Bind("wantsPupRoom", true);
+        wantsPupMap = config.Bind("wantsPupMap", true);
+        wantsEnhancedSlugpupAwareness = config.Bind("wantsEnhancedSlugpupAwareness", true);
     }
 
     public override void Initialize()
@@ -36,7 +38,9 @@ class WhereSlugpupOptions : OptionInterface
                 new OpCheckBox(wantsPupRoom, 50, 450),
                 new OpLabel(80, 450, "Show the found pup's spawn shelter name", false),
                 new OpCheckBox(wantsPupMap, 50, 400),
-                new OpLabel(80, 400, "Show the found pup's spawn shelter on map", false)
+                new OpLabel(80, 400, "Show the found pup's spawn shelter on map", false),
+                new OpCheckBox(wantsPupMap, 50, 450),
+                new OpLabel(80, 450, "Enhanced capability of detecting pups in the neighbours rooms", true),
         ];
 
         optionTab.AddItems(UIArrayElements);
