@@ -16,7 +16,7 @@ partial class WhereSlugpupMain : BaseUnityPlugin
 {
     public const string GUID = "prismsoup.whereslugpupmod";
     public const string Name = "Where Slugpup ?";
-    public const string Version = "1.0.2";
+    public const string Version = "1.1.0";
     bool isInit = false, isCycleStarted = false;
     private readonly WhereSlugpupOptions whereSlugpupOptions;
     private readonly CustomLogger CustomLogger;
