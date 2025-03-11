@@ -143,7 +143,7 @@ partial class WhereSlugpupMain : BaseUnityPlugin
         }
         else if (!isCycleStarted && newPupsCount > 0)
         {
-            string text = "Many slugpups has spawned!";
+            string text = "Many slugpups have spawned!";
             var sb = new StringBuilder(text); // more efficient with stringBuilder
             foreach (var pup in SpawnedPups.unTammedPups.Select(pupPair => pupPair.Key).ToList())
             {
