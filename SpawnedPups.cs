@@ -13,4 +13,24 @@ public class SpawnedPups
     tammedPups.Clear();
     uniqueMarkers.Clear();
   }
+
+  public bool Remove(AbstractCreature creature)
+  {
+    if (unTammedPups.ContainsKey(creature))
+    {
+      unTammedPups.Remove(creature);
+      return true;
+    }
+    if (tammedPups.ContainsKey(creature))
+    {
+      tammedPups.Remove(creature);
+      return true;
+    }
+    return false;
+  }
+
+  public bool ContainsKey(AbstractCreature creature)
+  {
+    return unTammedPups.ContainsKey(creature) || tammedPups.ContainsKey(creature);
+  }
 }
