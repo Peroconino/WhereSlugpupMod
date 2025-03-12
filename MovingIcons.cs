@@ -12,7 +12,7 @@ partial class WhereSlugpupMain
   {
     if (whereSlugpupOptions.wantsEnhancedSlugpupAwareness.Value && self.fade > 0f)
     {
-      List<AbstractCreature> slugcats = [.. SpawnedPups.unTammedPups.Keys, .. SpawnedPups.tammedPups.Keys];
+      List<AbstractCreature?> slugcats = [.. SpawnedPups.unTammedPups.Keys, .. SpawnedPups.tammedPups.Keys];
 
       FieldInfo creatureSymbolsField = typeof(Map).GetField("creatureSymbols", BindingFlags.NonPublic | BindingFlags.Instance);
       List<CreatureSymbol> creatureSymbols = (List<CreatureSymbol>)creatureSymbolsField.GetValue(self);// needed to use reflection here to access creatureSymbols
@@ -25,9 +25,10 @@ partial class WhereSlugpupMain
         }
       }
 
-      foreach (AbstractCreature slugcat in slugcats)
+      foreach (AbstractCreature? slugcat in slugcats)
       {
-        CreateSlugpupSymbol(self, slugcat, creatureSymbols, timeStacker);
+        if (slugcat is not null)
+          CreateSlugpupSymbol(self, slugcat, creatureSymbols, timeStacker);
       }
       slugcats.Clear();
     }

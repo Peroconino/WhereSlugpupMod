@@ -103,9 +103,7 @@ partial class WhereSlugpupMain : BaseUnityPlugin
         {
             var pupData = SpawnedPups.unTammedPups[self];
             pupData.FoundPupMarker.PupDied();
-            SpawnedPups.Remove(self);// remove from dictionary
         }
-
 
         orig(self);
     }
@@ -146,12 +144,12 @@ partial class WhereSlugpupMain : BaseUnityPlugin
         {
             string text = "Many slugpups has spawned!";
             var sb = new StringBuilder(text); // more efficient with stringBuilder
-            foreach (var pup in SpawnedPups.unTammedPups.Select(pupPair => pupPair.Key).ToList())
+            foreach (var pup in SpawnedPups.unTammedPups.Select(pupPair => pupPair.Key).AsEnumerable().Where(pup => pup is not null))
             {
                 if (whereSlugpupOptions.wantsPupID.Value)
-                    _ = sb.AppendFormat(CultureInfo.InvariantCulture, " {0}", pup.ID);
+                    _ = sb.AppendFormat(CultureInfo.InvariantCulture, " {0}", pup!.ID);
                 if (whereSlugpupOptions.wantsPupRoom.Value)
-                    _ = sb.AppendFormat(CultureInfo.InvariantCulture, " in {0}", pup.Room.name);
+                    _ = sb.AppendFormat(CultureInfo.InvariantCulture, " in {0}", pup!.Room.name);
             }
             text = sb.ToString();
             self.cameras[0].hud.textPrompt.AddMessage(text, 10, 450, false, true);

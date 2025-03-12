@@ -14,7 +14,7 @@ partial class WhereSlugpupMain
       for (int i = 0; i < uniqueMarkers.Count; i++)
       {
         var pup = unTammedPups.First(pup => pup.Value.FoundPupMarker.room == uniqueMarkers.ElementAt(i));
-        if (!pup.Value.IsMarkedOnTheMap)
+        if (pup.Key is not null && !pup.Value.IsMarkedOnTheMap)
         {
           pup.Key.world.game.cameras[0].hud.map.mapObjects.Add(unTammedPups[pup.Key].FoundPupMarker);
           pup.Value.IsMarkedOnTheMap = true;
