@@ -39,8 +39,9 @@ class WhereSlugpupOptions : OptionInterface
                 new OpLabel(80, 450, "Show the found pup's spawn shelter name", false),
                 new OpCheckBox(wantsPupMap, 50, 400),
                 new OpLabel(80, 400, "Show the found pup's spawn shelter on map", false),
-                new OpCheckBox(wantsPupMap, 50, 450),
-                new OpLabel(80, 450, "Enhanced capability of detecting pups in the neighbours rooms", true),
+                new OpCheckBox(wantsEnhancedSlugpupAwareness, 50, 350),
+                new OpLabel(80, 350, "Enhanced capability of detecting pups in nearby rooms", false),
+                new OpLabel(80, 320, "(This option requires pup map markers)", false)
         ];
 
         optionTab.AddItems(UIArrayElements);

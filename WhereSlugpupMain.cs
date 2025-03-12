@@ -16,7 +16,7 @@ partial class WhereSlugpupMain : BaseUnityPlugin
 {
     public const string GUID = "prismsoup.whereslugpupmod";
     public const string Name = "Where Slugpup ?";
-    public const string Version = "1.0.2";
+    public const string Version = "1.1.0";
     bool isInit = false, isCycleStarted = false;
     private readonly WhereSlugpupOptions whereSlugpupOptions;
     private readonly CustomLogger CustomLogger;
@@ -144,7 +144,7 @@ partial class WhereSlugpupMain : BaseUnityPlugin
         }
         else if (!isCycleStarted && newPupsCount > 0)
         {
-            string text = "Many slugpups has spawned!";
+            string text = "Many slugpups have spawned!";
             var sb = new StringBuilder(text); // more efficient with stringBuilder
             foreach (var pup in SpawnedPups.unTammedPups.Select(pupPair => pupPair.Key).ToList())
             {
