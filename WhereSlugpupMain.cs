@@ -99,10 +99,11 @@ partial class WhereSlugpupMain : BaseUnityPlugin
     private void Hook_On_AbstractCreature_Die(On.AbstractCreature.orig_Die orig, AbstractCreature self)
     {
 
-        if (self.world.game.IsStorySession && SpawnedPups.unTammedPups.ContainsKey(self))
+        if (self.world.game.IsStorySession && SpawnedPups.ContainsKey(self))
         {
             var pupData = SpawnedPups.unTammedPups[self];
             pupData.FoundPupMarker.PupDied();
+            SpawnedPups.Remove(self);// remove from dictionary
         }
 
 
